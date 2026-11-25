@@ -99,6 +99,7 @@ HEADERS += \
     os/appregistry.h \
     os/process.h \
     os/processrefreshservice.h \
+    os/processheatmap.h \
     os/processtreemodel.h \
     os/processmodel.h \
     os/processfilterproxy.h \

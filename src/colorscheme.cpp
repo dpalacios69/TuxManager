@@ -50,6 +50,7 @@ namespace
         { "SwapActivityGraphFillColor", &ColorScheme::SwapActivityGraphFillColor },
         { "SwapActivityGraphSecondaryFillColor", &ColorScheme::SwapActivityGraphSecondaryFillColor },
         { "GraphGridColor", &ColorScheme::GraphGridColor },
+        { "ProcessHeatmapColor", &ColorScheme::ProcessHeatmapColor },
         { "GraphOverlayTextColor", &ColorScheme::GraphOverlayTextColor },
         { "SidePanelBackgroundColor", &ColorScheme::SidePanelBackgroundColor },
         { "SidePanelItemSelectedBackgroundColor", &ColorScheme::SidePanelItemSelectedBackgroundColor },
@@ -165,6 +166,7 @@ ColorScheme ColorScheme::DefaultDark()
     scheme.SwapActivityGraphFillColor = QColor(0x66, 0x44, 0x22, 100); // dark tan, semi-transparent
     scheme.SwapActivityGraphSecondaryFillColor = QColor(0x4a, 0x2d, 0x14, 120); // very dark brown, semi-transparent
     scheme.GraphGridColor = QColor(0x88, 0x88, 0x99, 150);             // grey-blue, semi-transparent
+    scheme.ProcessHeatmapColor = QColor(0xc8, 0x8a, 0x10, 170);        // amber, alpha is the maximum intensity
     scheme.GraphOverlayTextColor = QColor(245, 245, 245, 220);         // near white, semi-transparent
     scheme.SidePanelBackgroundColor = QColor(0x12, 0x12, 0x1a);        // very dark navy
     scheme.SidePanelItemSelectedBackgroundColor = QColor(0x1a, 0x4a, 0x8a, 200); // dark blue, semi-transparent
@@ -227,6 +229,7 @@ ColorScheme ColorScheme::DefaultLight()
     scheme.SwapActivityGraphFillColor = QColor(0xe8, 0xd8, 0xb8, 110); // pale gold, semi-transparent
     scheme.SwapActivityGraphSecondaryFillColor = QColor(0xd5, 0xb8, 0x88, 125); // light gold, semi-transparent
     scheme.GraphGridColor = QColor(0x80, 0x80, 0x80, 72);              // grey, semi-transparent
+    scheme.ProcessHeatmapColor = QColor(0xff, 0xb3, 0x40, 190);        // amber, alpha is the maximum intensity
     scheme.GraphOverlayTextColor = QColor(35, 35, 35, 220);            // near black, semi-transparent
     scheme.SidePanelBackgroundColor = QColor(0xf3, 0xf5, 0xf8);        // very light grey-blue
     scheme.SidePanelItemSelectedBackgroundColor = QColor(0x66, 0xa8, 0xff, 96); // medium blue, semi-transparent

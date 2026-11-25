@@ -89,6 +89,7 @@ void Configuration::Load()
     this->ShowKernelTasks        = s.value("Processes/ShowKernelTasks",     this->ShowKernelTasks).toBool();
     this->ShowOtherUsersProcs    = s.value("Processes/ShowOtherUsersProcs", this->ShowOtherUsersProcs).toBool();
     this->ShowProcessIcons       = s.value("Processes/ShowIcons",           this->ShowProcessIcons).toBool();
+    this->ProcessHeatmap         = s.value("Processes/Heatmap",             this->ProcessHeatmap).toBool();
     this->ProcessTreeView        = s.value("Processes/TreeView",            this->ProcessTreeView).toBool();
     this->ProcessListSortColumn  = s.value("Processes/SortColumn",          this->ProcessListSortColumn).toInt();
     this->ProcessListSortOrder   = s.value("Processes/SortOrder",           this->ProcessListSortOrder).toInt();
@@ -177,6 +178,7 @@ void Configuration::Save()
     s.setValue("Processes/ShowKernelTasks",     this->ShowKernelTasks);
     s.setValue("Processes/ShowOtherUsersProcs", this->ShowOtherUsersProcs);
     s.setValue("Processes/ShowIcons",           this->ShowProcessIcons);
+    s.setValue("Processes/Heatmap",             this->ProcessHeatmap);
     s.setValue("Processes/TreeView",            this->ProcessTreeView);
     s.setValue("Processes/SortColumn",          this->ProcessListSortColumn);
     s.setValue("Processes/SortOrder",           this->ProcessListSortOrder);

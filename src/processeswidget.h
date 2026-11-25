@@ -113,6 +113,7 @@ class ProcessesWidget : public QWidget
         void setShowKernelTasks(bool checked);
         void setShowOtherUsersProcesses(bool checked);
         void setShowIcons(bool checked);
+        void setShowHeatmap(bool checked);
         void applyIconSetting();
         void captureExpandedTreePids(const QModelIndex &parentProxy, QSet<pid_t> &expandedPids) const;
         void restoreExpandedTreePids(const QModelIndex &sourceParent, const QSet<pid_t> &expandedPids);

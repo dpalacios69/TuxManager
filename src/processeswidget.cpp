@@ -676,6 +676,11 @@ void ProcessesWidget::onTableContextMenu(const QPoint &pos)
     iconsAct->setChecked(CFG->ShowProcessIcons);
     connect(iconsAct, &QAction::toggled, this, &ProcessesWidget::setShowIcons);
 
+    QAction *heatmapAct = viewMenu->addAction(tr("Usage heatmap"));
+    heatmapAct->setCheckable(true);
+    heatmapAct->setChecked(CFG->ProcessHeatmap);
+    connect(heatmapAct, &QAction::toggled, this, &ProcessesWidget::setShowHeatmap);
+
     viewMenu->addSeparator();
     QAction *tableModeAct = viewMenu->addAction(tr("Table view"));
     tableModeAct->setCheckable(true);
@@ -767,6 +772,11 @@ void ProcessesWidget::onTreeContextMenu(const QPoint &pos)
     iconsAct->setCheckable(true);
     iconsAct->setChecked(CFG->ShowProcessIcons);
     connect(iconsAct, &QAction::toggled, this, &ProcessesWidget::setShowIcons);
+
+    QAction *heatmapAct = viewMenu->addAction(tr("Usage heatmap"));
+    heatmapAct->setCheckable(true);
+    heatmapAct->setChecked(CFG->ProcessHeatmap);
+    connect(heatmapAct, &QAction::toggled, this, &ProcessesWidget::setShowHeatmap);
 
     viewMenu->addSeparator();
     QAction *tableModeAct = viewMenu->addAction(tr("Table view"));
@@ -975,6 +985,15 @@ void ProcessesWidget::setShowIcons(bool checked)
     this->applyIconSetting();
     this->onTimerTick();
     LOG_DEBUG(QString("ShowProcessIcons = %1").arg(checked));
+}
+
+void ProcessesWidget::setShowHeatmap(bool checked)
+{
+    CFG->ProcessHeatmap = checked;
+    // Cell data is unchanged, so force a repaint of both views.
+    this->ui->tableView->viewport()->update();
+    this->m_treeView->viewport()->update();
+    LOG_DEBUG(QString("ProcessHeatmap = %1").arg(checked));
 }
 
 // Creates or drops the registry according to the setting and points both models at it.

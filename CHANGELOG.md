@@ -1,3 +1,6 @@
+# Next
+  * Added usage heatmap to CPU, memory and I/O rate cells of the process table and tree (View -> Usage heatmap)
+
 # 1.1.0
   * Added application icons to the process table and tree, with an option to hide them
   * Process names now appear before PIDs by default, with the tree hierarchy beside names and icons

@@ -67,6 +67,7 @@ class ColorScheme
         QColor SwapActivityGraphFillColor;
         QColor SwapActivityGraphSecondaryFillColor;
         QColor GraphGridColor;
+        QColor ProcessHeatmapColor;
         QColor GraphOverlayTextColor;
         QColor SidePanelBackgroundColor;
         QColor SidePanelItemSelectedBackgroundColor;

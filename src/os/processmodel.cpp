@@ -20,6 +20,7 @@
 
 #include "appregistry.h"
 #include "proc.h"
+#include "processheatmap.h"
 #include "../configuration.h"
 #include "../misc.h"
 
@@ -110,6 +111,18 @@ QVariant ProcessModel::data(const QModelIndex &index, int role) const
         if (index.column() == ColName && this->m_appRegistry)
             return this->m_appRegistry->IconFor(proc.IconName);
         return {};
+    }
+
+    if (role == Qt::BackgroundRole)
+    {
+        switch (static_cast<Column>(index.column()))
+        {
+            case ColCpu:             return ProcessHeatmap::Cpu(proc);
+            case ColMemRss:          return ProcessHeatmap::Memory(proc);
+            case ColIoReadsPerSec:   return ProcessHeatmap::IoRate(proc, proc.IOReadBps);
+            case ColIoWritesPerSec:  return ProcessHeatmap::IoRate(proc, proc.IOWriteBps);
+            default:                 return {};
+        }
     }
 
     if (role == Qt::DisplayRole)
