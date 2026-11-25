@@ -20,6 +20,7 @@
 #define OS_PROCESSREFRESHSERVICE_H
 
 #include "process.h"
+#include "processgpu.h"
 
 #include <QElapsedTimer>
 #include <QHash>
@@ -44,6 +45,7 @@ namespace OS
                        bool includeKernelTasks,
                        bool includeOtherUsers,
                        bool collectIOMetrics,
+                       bool collectGpuMetrics,
                        bool isSuperuser,
                        uint effectiveUid,
                        uint myUid);
@@ -57,6 +59,7 @@ namespace OS
             QHash<pid_t, quint64> m_prevIoWriteBytes;
             quint64               m_prevCpuTotalTicks { 0 };
             QElapsedTimer         m_prevIoSampleTimer;
+            ProcessGpuSampler     m_gpuSampler;
             int                   m_numCpus { 1 };
 
             void flushIOMetrics();
@@ -84,6 +87,7 @@ namespace OS
                                 bool includeKernelTasks,
                                 bool includeOtherUsers,
                                 bool collectIOMetrics,
+                                bool collectGpuMetrics,
                                 bool isSuperuser,
                                 uint effectiveUid,
                                 uint myUid);

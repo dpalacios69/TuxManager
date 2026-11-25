@@ -1,0 +1,12 @@
+# SYNTHETIC: written from Documentation/gpu/drm-usage-stats.rst. msm reports nanoseconds AND
+# drm-cycles-gpu but no drm-total-cycles-gpu: nanoseconds must be used. Replace with a real capture.
+pos:	0
+flags:	02100002
+mnt_id:	27
+ino:	1045
+drm-driver:	msm
+drm-client-id:	7
+drm-engine-gpu:	3000000000 ns
+drm-cycles-gpu:	900000000
+drm-maxfreq-gpu:	800000000 Hz
+drm-total-memory:	4096 KiB

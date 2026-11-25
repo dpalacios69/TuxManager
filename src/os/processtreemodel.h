@@ -40,6 +40,7 @@ namespace OS
                 ColUser,
                 ColState,
                 ColCpu,
+                ColGpu,
                 ColMemRss,
                 ColMemVirt,
                 ColMemShared,

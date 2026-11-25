@@ -41,6 +41,7 @@ SOURCES += \
     os/proc.cpp \
     os/appregistry.cpp \
     os/process.cpp \
+    os/processgpu.cpp \
     os/processrefreshservice.cpp \
     os/processtreemodel.cpp \
     os/processmodel.cpp \
@@ -98,6 +99,7 @@ HEADERS += \
     os/proc.h \
     os/appregistry.h \
     os/process.h \
+    os/processgpu.h \
     os/processrefreshservice.h \
     os/processtreemodel.h \
     os/processmodel.h \

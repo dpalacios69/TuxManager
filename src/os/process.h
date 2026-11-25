@@ -44,6 +44,7 @@ namespace OS
                 bool  IncludeOtherUsers   { true };
                 uid_t MyUID               { 0 };
                 bool  CollectIOMetrics    { false };
+                bool  CollectGpuMetrics   { false };
                 bool  IsSuperuser         { false };
                 uid_t EffectiveUID        { 0 };
             };
@@ -80,6 +81,9 @@ namespace OS
             bool    IOTotalsAvailable { false }; ///< True when /proc/pid/io totals were read.
             bool    IORatesAvailable { false };  ///< True when a previous I/O sample exists.
             bool    IOPermissionDenied { false }; ///< True when I/O metrics were skipped due to permissions.
+            double  GpuPercent    { 0.0 };    ///< Busiest GPU engine of this process, 0-100 (see ProcessGpuSampler).
+            bool    GpuAvailable  { false };  ///< True when GpuPercent was measured (needs two samples and a data source).
+            bool    GpuPermissionDenied { false }; ///< True when another user's GPU clients cannot be inspected.
             QString IconName;                 ///< Theme icon name or absolute icon path resolved by AppRegistry, empty for generic
 
             /// Load a snapshot of every running process from /proc.

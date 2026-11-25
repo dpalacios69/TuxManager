@@ -1,0 +1,16 @@
+# SYNTHETIC: written from Documentation/gpu/drm-usage-stats.rst and the i915 fdinfo layout
+# (video has two instances: drm-engine-capacity-video). Replace with a real capture.
+pos:	0
+flags:	02100002
+mnt_id:	27
+ino:	1043
+drm-driver:	i915
+drm-pdev:	0000:00:02.0
+drm-client-id:	10
+drm-total-system0:	65536 KiB
+drm-shared-system0:	0
+drm-engine-render:	4000000000 ns
+drm-engine-copy:	0 ns
+drm-engine-video:	1000000000 ns
+drm-engine-capacity-video:	2
+drm-engine-video-enhance:	0 ns

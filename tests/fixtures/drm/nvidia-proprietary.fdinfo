@@ -1,0 +1,6 @@
+# REAL capture: fdinfo of an fd the Plasma shell holds open on /dev/dri/renderD128,
+# Fedora 44, kernel 7.3, proprietary NVIDIA driver (GTX 1660 SUPER). No drm-* keys at all.
+pos:	0
+flags:	0100002
+mnt_id:	41
+ino:	1300

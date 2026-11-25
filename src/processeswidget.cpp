@@ -151,12 +151,17 @@ bool ProcessesWidget::selectProcessInTree(pid_t pid)
 
 void ProcessesWidget::setupTable()
 {
-    static constexpr int PROCESS_COLUMN_SCHEMA_VERSION = 2;
+    static constexpr int PROCESS_COLUMN_SCHEMA_VERSION = 3;
     const int savedProcessColumnSchemaVersion = CFG->ProcessColumnSchemaVersion;
     const bool resetProcessHeaderState = savedProcessColumnSchemaVersion < 1;
-    const bool migrateProcessNameFirstLayout = savedProcessColumnSchemaVersion < 2;
+    // Schema 3 inserted the GPU column after CPU: a saved header state no longer matches the
+    // section count, so it is discarded once and the default layout is used.
+    const bool discardProcessHeaderState = resetProcessHeaderState || savedProcessColumnSchemaVersion < 3;
+    const bool migrateProcessNameFirstLayout = savedProcessColumnSchemaVersion < 2 || discardProcessHeaderState;
     if (resetProcessHeaderState && CFG->ProcessListSortColumn > OS::ProcessModel::ColMemVirt)
         CFG->ProcessListSortColumn += 3;
+    if (savedProcessColumnSchemaVersion < 3 && CFG->ProcessListSortColumn > OS::ProcessModel::ColCpu)
+        CFG->ProcessListSortColumn += 1;
 
     this->m_proxy->setSourceModel(this->m_model);
     this->m_treeProxy->setSourceModel(this->m_treeModel);
@@ -223,6 +228,7 @@ void ProcessesWidget::setupTable()
     tv->setColumnWidth(OS::ProcessModel::ColUser,     90);
     tv->setColumnWidth(OS::ProcessModel::ColState,    90);
     tv->setColumnWidth(OS::ProcessModel::ColCpu,      65);
+    tv->setColumnWidth(OS::ProcessModel::ColGpu,      65);
     tv->setColumnWidth(OS::ProcessModel::ColMemRss,   80);
     tv->setColumnWidth(OS::ProcessModel::ColMemVirt,  80);
     tv->setColumnWidth(OS::ProcessModel::ColMemShared, 80);
@@ -246,7 +252,7 @@ void ProcessesWidget::setupTable()
     hv->hideSection(OS::ProcessModel::ColIoWrites);
     hv->hideSection(OS::ProcessModel::ColIoReadsPerSec);
     hv->hideSection(OS::ProcessModel::ColIoWritesPerSec);
-    if (!resetProcessHeaderState && !CFG->ProcessListHeaderState.isEmpty())
+    if (!discardProcessHeaderState && !CFG->ProcessListHeaderState.isEmpty())
     {
         hv->restoreState(CFG->ProcessListHeaderState);
     }
@@ -291,6 +297,7 @@ void ProcessesWidget::setupTable()
     this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColUser, 90);
     this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColState, 90);
     this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColCpu, 65);
+    this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColGpu, 65);
     this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColMemRss, 80);
     this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColMemVirt, 80);
     this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColMemShared, 80);
@@ -315,7 +322,7 @@ void ProcessesWidget::setupTable()
     this->m_treeView->setColumnHidden(OS::ProcessTreeModel::ColIoWritesPerSec, true);
     connect(this->m_treeView, &QTreeView::expanded, this, [this]() { this->m_treeView->resizeColumnToContents(OS::ProcessTreeModel::ColName); });
     connect(this->m_treeView, &QTreeView::collapsed, this, [this]() { this->m_treeView->resizeColumnToContents(OS::ProcessTreeModel::ColName); });
-    if (!resetProcessHeaderState && !CFG->ProcessTreeHeaderState.isEmpty())
+    if (!discardProcessHeaderState && !CFG->ProcessTreeHeaderState.isEmpty())
     {
         treeHeader->restoreState(CFG->ProcessTreeHeaderState);
     }
@@ -341,6 +348,7 @@ void ProcessesWidget::setupTable()
     this->m_treeView->addAction(terminate_action);
 
     this->updateIOMetricsEnabledState(false);
+    this->updateGpuMetricsEnabledState(false);
 
     this->setTreeViewMode(CFG->ProcessTreeView);
 }
@@ -421,6 +429,7 @@ void ProcessesWidget::startRefresh()
     options.IncludeOtherUsers = this->m_proxy->ShowOtherUsersProcs;
     options.MyUID = ::getuid();
     options.CollectIOMetrics = CFG->IOMetricsEnabled;
+    options.CollectGpuMetrics = CFG->GpuMetricsEnabled;
     options.IsSuperuser = CFG->IsSuperuser;
     options.EffectiveUID = CFG->EUID;
 
@@ -540,6 +549,7 @@ void ProcessesWidget::showHeaderContextMenu(QHeaderView *header, int columnCount
     this->saveTableHeaderState();
     this->saveTreeHeaderState();
     this->updateIOMetricsEnabledState();
+    this->updateGpuMetricsEnabledState();
 }
 
 void ProcessesWidget::saveTableHeaderState() const
@@ -606,6 +616,23 @@ void ProcessesWidget::updateIOMetricsEnabledState(bool triggerImmediateRefresh)
     const bool changed = (CFG->IOMetricsEnabled != enabled);
 
     CFG->IOMetricsEnabled = enabled;
+
+    if (changed && enabled && triggerImmediateRefresh && this->m_active && !CFG->RefreshPaused && !this->m_tableContextMenuOpen)
+        this->startRefresh();
+}
+
+bool ProcessesWidget::anyGpuMetricsColumnVisible() const
+{
+    const QHeaderView *table_header = this->ui && this->ui->tableView ? this->ui->tableView->horizontalHeader() : nullptr;
+    return table_header && !table_header->isSectionHidden(OS::ProcessModel::ColGpu);
+}
+
+void ProcessesWidget::updateGpuMetricsEnabledState(bool triggerImmediateRefresh)
+{
+    const bool enabled = this->anyGpuMetricsColumnVisible();
+    const bool changed = (CFG->GpuMetricsEnabled != enabled);
+
+    CFG->GpuMetricsEnabled = enabled;
 
     if (changed && enabled && triggerImmediateRefresh && this->m_active && !CFG->RefreshPaused && !this->m_tableContextMenuOpen)
         this->startRefresh();

@@ -121,6 +121,10 @@ QVariant ProcessModel::data(const QModelIndex &index, int role) const
             case ColUser:     return proc.User;
             case ColState:    return Process::GetStateString(proc.State);
             case ColCpu:      return QString::number(proc.CPUPercent, 'f', 1) + " %";
+            case ColGpu:
+                if (proc.GpuPermissionDenied)
+                    return QString("?");
+                return proc.GpuAvailable ? QString::number(proc.GpuPercent, 'f', 1) + " %" : QString::fromUtf8("\u2014");
             case ColMemRss:   return Misc::FormatKiB(proc.VMRssKb, 0);
             case ColMemVirt:  return Misc::FormatKiB(proc.vmSizeKb, 0);
             case ColMemShared:return Misc::FormatKiB(proc.SharedKb, 0);
@@ -151,6 +155,7 @@ QVariant ProcessModel::data(const QModelIndex &index, int role) const
         {
             case ColPid:      return static_cast<qlonglong>(proc.PID);
             case ColCpu:      return proc.CPUPercent;
+            case ColGpu:      return proc.GpuAvailable ? proc.GpuPercent : -1.0;
             case ColMemRss:   return static_cast<qulonglong>(proc.VMRssKb);
             case ColMemVirt:  return static_cast<qulonglong>(proc.vmSizeKb);
             case ColMemShared:return static_cast<qulonglong>(proc.SharedKb);
@@ -185,6 +190,7 @@ QVariant ProcessModel::data(const QModelIndex &index, int role) const
         {
             case ColPid:
             case ColCpu:
+            case ColGpu:
             case ColMemRss:
             case ColMemVirt:
             case ColMemShared:
@@ -429,6 +435,7 @@ QString ProcessModel::columnHeader(Column col)
         case ColUser:     return tr("User");
         case ColState:    return tr("State");
         case ColCpu:      return tr("CPU %");
+        case ColGpu:      return tr("GPU %");
         case ColMemRss:   return tr("MEM RES");
         case ColMemVirt:  return tr("MEM VIRT");
         case ColMemShared:return tr("MEM SHR");

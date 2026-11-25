@@ -46,3 +46,10 @@ jobs:
       - name: Build
         working-directory: src
         run: make -j"$(nproc)"
+
+      - name: Unit tests (per-process GPU usage)
+        working-directory: tests/processgpu
+        run: |
+          qmake6 processgpu.pro
+          make -j"$(nproc)"
+          QT_QPA_PLATFORM=offscreen ./processgpu_test

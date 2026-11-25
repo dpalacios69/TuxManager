@@ -1,3 +1,8 @@
+# Next
+  * Added a GPU % column to the process table and tree, from DRM fdinfo (AMD, Intel, Nouveau, ARM, ...) and NVML (proprietary NVIDIA)
+  * Added unit tests for the DRM fdinfo parser and utilization math, and docs/gpu-process-usage.md
+  * The process column layout is reset once because of the new GPU % column
+
 # 1.1.0
   * Added application icons to the process table and tree, with an option to hide them
   * Process names now appear before PIDs by default, with the tree hierarchy beside names and icons
