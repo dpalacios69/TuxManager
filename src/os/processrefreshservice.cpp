@@ -38,6 +38,7 @@ void ProcessRefreshWorker::fetch(int consumer,
                                  bool includeOtherUsers,
                                  bool collectIOMetrics,
                                  bool collectGpuMetrics,
+                                 bool collectNetMetrics,
                                  bool isSuperuser,
                                  uint effectiveUid,
                                  uint myUid)
@@ -104,6 +105,10 @@ void ProcessRefreshWorker::fetch(int consumer,
         this->m_gpuSampler.Sample(fresh);
     else
         this->m_gpuSampler.Reset();
+    if (collectNetMetrics)
+        this->m_netSampler.Sample(fresh);
+    else
+        this->m_netSampler.Reset();
 
     this->m_prevTicks.clear();
     this->m_prevTicks.reserve(fresh.size());
@@ -176,6 +181,7 @@ void ProcessRefreshService::RequestSnapshot(Consumer consumer, quint64 token, co
                         options.IncludeOtherUsers,
                         options.CollectIOMetrics,
                         options.CollectGpuMetrics,
+                        options.CollectNetMetrics,
                         options.IsSuperuser,
                         static_cast<uint>(options.EffectiveUID),
                         static_cast<uint>(options.MyUID));

@@ -1,7 +1,9 @@
 # Next
-  * Added a GPU % column to the process table and tree, from DRM fdinfo (AMD, Intel, Nouveau, ARM, ...) and NVML (proprietary NVIDIA)
-  * Added unit tests for the DRM fdinfo parser and utilization math, and docs/gpu-process-usage.md
-  * The process column layout is reset once because of the new GPU % column
+  * Added GPU %, Disk and Network columns to the process table and tree, like the Windows Task Manager
+  * GPU % comes from DRM fdinfo (AMD, Intel, Nouveau, ARM, ...) and NVML (proprietary NVIDIA)
+  * Disk is the read + write rate and Network is the TCP throughput of each process
+  * Added unit tests for the DRM fdinfo parser and the network sampler, and docs/gpu-process-usage.md and docs/process-disk-network.md
+  * The process column layout is reset once because of the new columns
 
 # 1.1.0
   * Added application icons to the process table and tree, with an option to hide them

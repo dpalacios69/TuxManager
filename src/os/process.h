@@ -45,6 +45,7 @@ namespace OS
                 uid_t MyUID               { 0 };
                 bool  CollectIOMetrics    { false };
                 bool  CollectGpuMetrics   { false };
+                bool  CollectNetMetrics   { false };
                 bool  IsSuperuser         { false };
                 uid_t EffectiveUID        { 0 };
             };
@@ -84,6 +85,9 @@ namespace OS
             double  GpuPercent    { 0.0 };    ///< Busiest GPU engine of this process, 0-100 (see ProcessGpuSampler).
             bool    GpuAvailable  { false };  ///< True when GpuPercent was measured (needs two samples and a data source).
             bool    GpuPermissionDenied { false }; ///< True when another user's GPU clients cannot be inspected.
+            double  NetBps        { 0.0 };    ///< TCP bytes per second, see ProcessNetSampler for what is counted.
+            bool    NetAvailable  { false };  ///< True when NetBps was measured (needs two samples).
+            bool    NetPermissionDenied { false }; ///< True when another user's sockets cannot be inspected.
             QString IconName;                 ///< Theme icon name or absolute icon path resolved by AppRegistry, empty for generic
 
             /// Load a snapshot of every running process from /proc.

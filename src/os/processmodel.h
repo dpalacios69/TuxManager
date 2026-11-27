@@ -42,12 +42,14 @@ namespace OS
                 ColUser,
                 ColState,
                 ColCpu,
-                ColGpu,
                 ColMemRss,
                 ColMemVirt,
                 ColMemShared,
                 ColMemText,
                 ColMemData,
+                ColDisk,        ///< I/O read + write rate, like the Windows Task Manager's Disk column
+                ColNetwork,     ///< TCP throughput, see ProcessNetSampler
+                ColGpu,         ///< Busiest GPU engine, see ProcessGpuSampler
                 ColIoReads,
                 ColIoWrites,
                 ColIoReadsPerSec,

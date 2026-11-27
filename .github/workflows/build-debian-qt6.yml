@@ -53,3 +53,10 @@ jobs:
           qmake6 processgpu.pro
           make -j"$(nproc)"
           QT_QPA_PLATFORM=offscreen ./processgpu_test
+
+      - name: Unit tests (per-process network usage)
+        working-directory: tests/processnet
+        run: |
+          qmake6 processnet.pro
+          make -j"$(nproc)"
+          QT_QPA_PLATFORM=offscreen ./processnet_test

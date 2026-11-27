@@ -151,17 +151,22 @@ bool ProcessesWidget::selectProcessInTree(pid_t pid)
 
 void ProcessesWidget::setupTable()
 {
-    static constexpr int PROCESS_COLUMN_SCHEMA_VERSION = 3;
+    static constexpr int PROCESS_COLUMN_SCHEMA_VERSION = 4;
     const int savedProcessColumnSchemaVersion = CFG->ProcessColumnSchemaVersion;
     const bool resetProcessHeaderState = savedProcessColumnSchemaVersion < 1;
-    // Schema 3 inserted the GPU column after CPU: a saved header state no longer matches the
-    // section count, so it is discarded once and the default layout is used.
-    const bool discardProcessHeaderState = resetProcessHeaderState || savedProcessColumnSchemaVersion < 3;
+    // Schema 4 inserted the Disk, Network and GPU columns after MEM DATA: a saved header state no
+    // longer matches the section count, so it is discarded once and the default layout is used.
+    // A header state saved with a different number of columns (another version of the program
+    // sharing the same settings) would be applied to the wrong sections, so the count is checked too.
+    const bool processColumnsChanged = CFG->ProcessColumnCount != OS::ProcessModel::ColCount;
+    const bool discardProcessHeaderState = resetProcessHeaderState || savedProcessColumnSchemaVersion < 4 || processColumnsChanged;
     const bool migrateProcessNameFirstLayout = savedProcessColumnSchemaVersion < 2 || discardProcessHeaderState;
     if (resetProcessHeaderState && CFG->ProcessListSortColumn > OS::ProcessModel::ColMemVirt)
         CFG->ProcessListSortColumn += 3;
-    if (savedProcessColumnSchemaVersion < 3 && CFG->ProcessListSortColumn > OS::ProcessModel::ColCpu)
-        CFG->ProcessListSortColumn += 1;
+    if (savedProcessColumnSchemaVersion < 4 && CFG->ProcessListSortColumn > OS::ProcessModel::ColMemData)
+        CFG->ProcessListSortColumn += 3;
+    if (CFG->ProcessListSortColumn < 0 || CFG->ProcessListSortColumn >= OS::ProcessModel::ColCount)
+        CFG->ProcessListSortColumn = OS::ProcessModel::ColCpu;
 
     this->m_proxy->setSourceModel(this->m_model);
     this->m_treeProxy->setSourceModel(this->m_treeModel);
@@ -234,6 +239,8 @@ void ProcessesWidget::setupTable()
     tv->setColumnWidth(OS::ProcessModel::ColMemShared, 80);
     tv->setColumnWidth(OS::ProcessModel::ColMemText,  80);
     tv->setColumnWidth(OS::ProcessModel::ColMemData,  80);
+    tv->setColumnWidth(OS::ProcessModel::ColDisk,     90);
+    tv->setColumnWidth(OS::ProcessModel::ColNetwork,  90);
     tv->setColumnWidth(OS::ProcessModel::ColIoReads,  90);
     tv->setColumnWidth(OS::ProcessModel::ColIoWrites, 90);
     tv->setColumnWidth(OS::ProcessModel::ColIoReadsPerSec, 100);
@@ -303,6 +310,8 @@ void ProcessesWidget::setupTable()
     this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColMemShared, 80);
     this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColMemText, 80);
     this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColMemData, 80);
+    this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColDisk, 90);
+    this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColNetwork, 90);
     this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColIoReads, 90);
     this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColIoWrites, 90);
     this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColIoReadsPerSec, 100);
@@ -331,9 +340,10 @@ void ProcessesWidget::setupTable()
     this->m_treeView->setColumnWidth(OS::ProcessTreeModel::ColPid, 65);
     this->syncAllProcessColumnVisibility();
     this->m_treeHeaderPersistenceEnabled = true;
-    if (savedProcessColumnSchemaVersion < PROCESS_COLUMN_SCHEMA_VERSION)
+    if (savedProcessColumnSchemaVersion < PROCESS_COLUMN_SCHEMA_VERSION || processColumnsChanged)
     {
         CFG->ProcessColumnSchemaVersion = PROCESS_COLUMN_SCHEMA_VERSION;
+        CFG->ProcessColumnCount = OS::ProcessModel::ColCount;
         this->saveTableHeaderState();
         this->saveTreeHeaderState();
     }
@@ -349,6 +359,7 @@ void ProcessesWidget::setupTable()
 
     this->updateIOMetricsEnabledState(false);
     this->updateGpuMetricsEnabledState(false);
+    this->updateNetMetricsEnabledState(false);
 
     this->setTreeViewMode(CFG->ProcessTreeView);
 }
@@ -430,6 +441,7 @@ void ProcessesWidget::startRefresh()
     options.MyUID = ::getuid();
     options.CollectIOMetrics = CFG->IOMetricsEnabled;
     options.CollectGpuMetrics = CFG->GpuMetricsEnabled;
+    options.CollectNetMetrics = CFG->NetMetricsEnabled;
     options.IsSuperuser = CFG->IsSuperuser;
     options.EffectiveUID = CFG->EUID;
 
@@ -550,6 +562,7 @@ void ProcessesWidget::showHeaderContextMenu(QHeaderView *header, int columnCount
     this->saveTreeHeaderState();
     this->updateIOMetricsEnabledState();
     this->updateGpuMetricsEnabledState();
+    this->updateNetMetricsEnabledState();
 }
 
 void ProcessesWidget::saveTableHeaderState() const
@@ -604,7 +617,8 @@ bool ProcessesWidget::anyIOMetricsColumnVisible() const
     if (!tableHeader)
         return false;
 
-    return !tableHeader->isSectionHidden(OS::ProcessModel::ColIoReads)
+    return !tableHeader->isSectionHidden(OS::ProcessModel::ColDisk)
+           || !tableHeader->isSectionHidden(OS::ProcessModel::ColIoReads)
            || !tableHeader->isSectionHidden(OS::ProcessModel::ColIoWrites)
            || !tableHeader->isSectionHidden(OS::ProcessModel::ColIoReadsPerSec)
            || !tableHeader->isSectionHidden(OS::ProcessModel::ColIoWritesPerSec);
@@ -633,6 +647,23 @@ void ProcessesWidget::updateGpuMetricsEnabledState(bool triggerImmediateRefresh)
     const bool changed = (CFG->GpuMetricsEnabled != enabled);
 
     CFG->GpuMetricsEnabled = enabled;
+
+    if (changed && enabled && triggerImmediateRefresh && this->m_active && !CFG->RefreshPaused && !this->m_tableContextMenuOpen)
+        this->startRefresh();
+}
+
+bool ProcessesWidget::anyNetMetricsColumnVisible() const
+{
+    const QHeaderView *table_header = this->ui && this->ui->tableView ? this->ui->tableView->horizontalHeader() : nullptr;
+    return table_header && !table_header->isSectionHidden(OS::ProcessModel::ColNetwork);
+}
+
+void ProcessesWidget::updateNetMetricsEnabledState(bool triggerImmediateRefresh)
+{
+    const bool enabled = this->anyNetMetricsColumnVisible();
+    const bool changed = (CFG->NetMetricsEnabled != enabled);
+
+    CFG->NetMetricsEnabled = enabled;
 
     if (changed && enabled && triggerImmediateRefresh && this->m_active && !CFG->RefreshPaused && !this->m_tableContextMenuOpen)
         this->startRefresh();

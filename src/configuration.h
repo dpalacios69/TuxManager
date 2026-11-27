@@ -55,6 +55,7 @@ class Configuration : public QObject
         bool IsSuperuser { false };  ///< True when effective UID is 0 (runtime-only).
         uid_t EUID { 0 };            ///< Effective user ID captured at startup (runtime-only).
         bool GpuMetricsEnabled { false }; ///< True when the Processes GPU column is visible (runtime-only).
+        bool NetMetricsEnabled { false }; ///< True when the Processes Network column is visible (runtime-only).
         bool IOMetricsEnabled { false }; ///< True when any Processes I/O column is visible (runtime-only).
         bool ForceGpuDrm { false };  ///< Force DRM GPU backend and skip NVML detection (runtime-only).
         //! Intervals (in ms) available in menus for refresh rate (250ms, 1s, 5s etc.)
@@ -71,6 +72,7 @@ class Configuration : public QObject
         int  ProcessListSortColumn { 4 };   ///< ColCpu — column index to sort by
         int  ProcessListSortOrder  { 1 };   ///< Qt::DescendingOrder
         int  ProcessColumnSchemaVersion { 0 }; ///< Version for persisted process header states.
+        int  ProcessColumnCount { 0 };         ///< Number of process columns the header states were saved with (0 = unknown).
         QByteArray ProcessListHeaderState;  ///< Saved via QHeaderView::saveState()
         QByteArray ProcessTreeHeaderState;  ///< Saved via QHeaderView::saveState()
         QStringList TaskHistory;            ///< Most recently executed task commands.

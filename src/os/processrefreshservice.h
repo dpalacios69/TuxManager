@@ -21,6 +21,7 @@
 
 #include "process.h"
 #include "processgpu.h"
+#include "processnet.h"
 
 #include <QElapsedTimer>
 #include <QHash>
@@ -46,6 +47,7 @@ namespace OS
                        bool includeOtherUsers,
                        bool collectIOMetrics,
                        bool collectGpuMetrics,
+                       bool collectNetMetrics,
                        bool isSuperuser,
                        uint effectiveUid,
                        uint myUid);
@@ -60,6 +62,7 @@ namespace OS
             quint64               m_prevCpuTotalTicks { 0 };
             QElapsedTimer         m_prevIoSampleTimer;
             ProcessGpuSampler     m_gpuSampler;
+            ProcessNetSampler     m_netSampler;
             int                   m_numCpus { 1 };
 
             void flushIOMetrics();
@@ -88,6 +91,7 @@ namespace OS
                                 bool includeOtherUsers,
                                 bool collectIOMetrics,
                                 bool collectGpuMetrics,
+                                bool collectNetMetrics,
                                 bool isSuperuser,
                                 uint effectiveUid,
                                 uint myUid);
